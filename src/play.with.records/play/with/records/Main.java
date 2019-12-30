@@ -3,6 +3,8 @@ package play.with.records;
 import javafx.util.Pair;
 
 import java.lang.management.ManagementFactory;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,12 +32,10 @@ public class Main {
 
         // Records in java 14
         record PersonRecord (String name,int age){
-            public PersonRecord(String name, int age){
+            public PersonRecord {
                 if (age > 120) {
                     throw new IllegalArgumentException("Sorry, age(%d) is too high".formatted(age));
                 }
-                this.name = name;
-                this.age = age;
             }
 
             boolean isWise () {
@@ -60,7 +60,19 @@ public class Main {
             LOGGER.log(Level.INFO, "Exception caught: {0}", e.getMessage());
         }
 
-        System.out.println("After exception");
+        List<Integer> numbers = List.of(1, 2, 3, 4, 10, 9, 8, 7, 6, 5);
+
+        record MinMax<T > (T min, T max){
+        }
+
+        MinMax minMaxOfNumbers = new MinMax(numbers.stream().mapToInt(x -> x).min().getAsInt(), numbers.stream().mapToInt(x -> x).max().getAsInt());
+        System.out.println(minMaxOfNumbers);
+
+        List<PersonRecord> personRecords = List.of(person, wisePerson, new PersonRecord("Toddler", 4));
+
+        MinMax minMaxOfPersonsByAge = new MinMax(personRecords.stream().min(Comparator.comparingInt(PersonRecord::age)).get(),
+                personRecords.stream().max(Comparator.comparingInt(PersonRecord::age)).get());
+        System.out.println(minMaxOfPersonsByAge);
 
     }
 }
